@@ -1,6 +1,6 @@
-# Gym Tracker API
+# WorkoutOS
 
-A Python backend project for tracking exercises, workout routines, and estimated one-rep maxes. The project started as a terminal workout tracker and evolved into a FastAPI REST API backed by SQLite.
+A full-stack workout tracking application built with Python, FastAPI, SQLite, and REST APIs to log exercises, manage workout routines, calculate estimated one-rep maxes, and organize reusable exercise history.
 
 ## Features
 
