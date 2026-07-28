@@ -1,5 +1,4 @@
 # WorkoutOS
-
 A full-stack workout tracking application built with Python, FastAPI, SQLite, and REST APIs to log exercises, manage workout routines, calculate estimated one-rep maxes, and organize reusable exercise history.
 
 ## Features

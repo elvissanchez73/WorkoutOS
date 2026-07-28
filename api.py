@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from models import Workout
+import os
 from pydantic import BaseModel
 from workout_database import (
     add_exercise_to_routine,
@@ -59,9 +60,16 @@ class WorkoutUpdateWeight(BaseModel):
 
 app = FastAPI(title="Workout Tracker API", version="1.0.0")
 
+# Allow origins from environment (comma-separated) so deployed frontend can be added
+_origins_env = os.getenv("ALLOWED_ORIGINS")
+if _origins_env:
+    origins = [o.strip() for o in _origins_env.split(",") if o.strip()]
+else:
+    origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
