@@ -6,6 +6,7 @@ import { FormEvent, useState } from "react";
 export default function CreateRoutineForm() {
 	const router = useRouter();
 	const [error, setError] = useState("");
+	const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -14,7 +15,7 @@ export default function CreateRoutineForm() {
 		const formData = new FormData(event.currentTarget);
 		const name = formData.get("name") as string;
 
-		const response = await fetch("http://127.0.0.1:8000/routines", {
+		const response = await fetch(`${API_BASE}/routines`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -32,15 +33,19 @@ export default function CreateRoutineForm() {
 	}
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<label htmlFor="name">Routine name:</label>
-			<input type="text" id="name" name="name" className="bg-white border border-gray-300 rounded px-3 py-2 text-black ${className}" required />
+		<form className="form-panel" onSubmit={handleSubmit}>
+			<div className="field-group">
+				<label className="field-label" htmlFor="name">
+					Routine name
+				</label>
+				<input className="input-field" type="text" id="name" name="name" required />
+			</div>
 
-			<button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+			<button type="submit" className="btn btn-primary">
 				Create Routine
 			</button>
 
-			{error && <p>{error}</p>}
+			{error && <p className="error-text">{error}</p>}
 		</form>
 	);
 }

@@ -1,55 +1,60 @@
-"use client"
-import SubmitNewWorkout from "./SubmitNewWorkout";
+"use client";
+
 import { useRouter } from "next/navigation";
+import SubmitNewWorkout from "./SubmitNewWorkout";
 
-const CreateWorkoutForm = () => {
-const router = useRouter();
-const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const reps = Number(formData.get("reps") as string);
-    
-    const weight_lbs = Number(formData.get("weight_lbs") as string);
-        const response = await fetch("http://127.0.0.1:8000/workouts", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+export default function CreateWorkoutForm() {
+    const router = useRouter();
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
-        body: JSON.stringify({
-            name,
-            reps,
-            weight_lbs,
-        }),
+    async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get("name") as string;
+        const reps = Number(formData.get("reps") as string);
+        const weight_lbs = Number(formData.get("weight_lbs") as string);
 
+        const response = await fetch(`${API_BASE}/workouts`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, reps, weight_lbs }),
         });
 
-        
         if (!response.ok) {
             console.error("Failed to create workout");
-            return ;
+            return;
         }
-       
+
         router.push("/workouts");
         router.refresh();
-        }
+    }
 
-        return (
-    <form onSubmit={handleFormSubmit}>
-      <label htmlFor="name">Name:</label>
-      <input type="text" id="name" name="name" className="bg-white border border-gray-300 rounded px-3 py-2 text-black ${className}"  required />
-      <label htmlFor="reps">Reps:</label>
-      <input type="number" id="reps" name="reps" className="bg-white border border-gray-300 rounded px-3 py-2 text-black ${className}" required />
-      <label htmlFor="weight_lbs">Weight (lbs):</label>
-      <input type="number" id="weight_lbs" name="weight_lbs" className="bg-white border border-gray-300 rounded px-3 py-2 text-black ${className}" required />
-      <SubmitNewWorkout />
-    </form>
-  );
+    return (
+        <form className="form-panel" onSubmit={handleFormSubmit}>
+            <div className="field-group">
+                <label className="field-label" htmlFor="name">
+                    Exercise name
+                </label>
+                <input className="input-field" type="text" id="name" name="name" required />
+            </div>
 
-  };
+            <div className="field-group">
+                <label className="field-label" htmlFor="reps">
+                    Reps
+                </label>
+                <input className="input-field" type="number" id="reps" name="reps" required />
+            </div>
 
-  
+            <div className="field-group">
+                <label className="field-label" htmlFor="weight_lbs">
+                    Weight in pounds
+                </label>
+                <input className="input-field" type="number" id="weight_lbs" name="weight_lbs" required />
+            </div>
 
-
-export default CreateWorkoutForm;
+            <SubmitNewWorkout />
+        </form>
+    );
+}

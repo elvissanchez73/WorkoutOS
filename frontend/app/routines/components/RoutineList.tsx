@@ -15,6 +15,7 @@ type RoutineListProps = {
 
 export default function RoutineList({ routines }: RoutineListProps) {
   const router = useRouter();
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
   const [selectedRoutines, setSelectedRoutines] = useState<string[]>([]);
   const [error, setError] = useState("");
 
@@ -39,7 +40,7 @@ export default function RoutineList({ routines }: RoutineListProps) {
 
     const responses = await Promise.all(
       selectedRoutines.map((routineName) =>
-        fetch(`http://127.0.0.1:8000/routines/${encodeURIComponent(routineName)}`, {
+        fetch(`${API_BASE}/routines/${encodeURIComponent(routineName)}`, {
           method: "DELETE",
         })
       )
@@ -57,33 +58,51 @@ export default function RoutineList({ routines }: RoutineListProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="page-stack" onSubmit={handleSubmit}>
       {routines.length === 0 ? (
-        <p>No routines found.</p>
+        <div className="empty-state">
+          <p>No routines yet. Create your first training day and add exercises.</p>
+        </div>
       ) : (
-        <ul>
+        <ul className="card-grid">
           {routines.map((routine) => (
-            <li key={routine.id}>
-              <label>
+            <li
+              className={`fitness-card ${
+                selectedRoutines.includes(routine.name) ? "is-selected" : ""
+              }`}
+              key={routine.id}
+            >
+              <label className="item-row">
                 <input
+                  className="item-check"
                   type="checkbox"
                   checked={selectedRoutines.includes(routine.name)}
                   onChange={() => handleRoutineToggle(routine.name)}
                 />
-                <Link href={`/routines/${encodeURIComponent(routine.name)}`}>
-                  {routine.name}
-                </Link>
+                <span className="item-main">
+                  <Link
+                    className="card-link"
+                    href={`/routines/${encodeURIComponent(routine.name)}`}
+                  >
+                    <span className="item-name">{routine.name}</span>
+                    <span className="item-meta">
+                      <span className="metric">
+                        <strong>Open</strong> plan
+                      </span>
+                    </span>
+                  </Link>
+                </span>
               </label>
             </li>
           ))}
         </ul>
       )}
 
-      <button type="submit" className="px-4 py-2 bg-red-500 text-white rounded">
+      <button type="submit" className="btn btn-danger">
         Delete Selected Routines
       </button>
 
-      {error && <p>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </form>
   );
 }

@@ -19,12 +19,11 @@ export default async function RoutinePage({
   const { addExercises } = await searchParams;
   const routineDecoded = decodeURIComponent(routineName);
 
-  const workoutResponse = await fetch(
-    `http://127.0.0.1:8000/routines/${routineName}/exercises`,
-    {
-      cache: "no-store",
-    }
-  );
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
+  const workoutResponse = await fetch(`${API_BASE}/routines/${routineName}/exercises`, {
+    cache: "no-store",
+  });
 
   if (!workoutResponse.ok) {
     return <p>Failed to fetch routine details.</p>;
@@ -33,14 +32,20 @@ export default async function RoutinePage({
   const workoutData: Workout[] = await workoutResponse.json();
 
   return (
-    <div>
-      <h1>Exercises in {routineDecoded}</h1>
+    <main className="page-stack">
+      <section className="hero-panel">
+        <span className="eyebrow">Routine</span>
+        <h1 className="page-title">{routineDecoded}</h1>
+        <p className="page-copy">
+          Review the exercises in this plan and adjust the session before training.
+        </p>
+      </section>
 
       <AddExerciseToRoutineForm
         routineName={routineDecoded}
         initiallyOpen={addExercises === "true"}
       />
       <RoutineExerciseList routineName={routineDecoded} exercises={workoutData} />
-    </div>
+    </main>
   );
 }

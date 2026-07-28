@@ -20,6 +20,7 @@ export default function RoutineExerciseList({
 	exercises,
 }: RoutineExerciseListProps) {
 	const router = useRouter();
+	const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 	const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 	const [error, setError] = useState("");
 
@@ -45,9 +46,9 @@ export default function RoutineExerciseList({
 		const responses = await Promise.all(
 			selectedExercises.map((exerciseName) =>
 				fetch(
-					`http://127.0.0.1:8000/routines/${encodeURIComponent(
-						routineName
-					)}/exercises/${encodeURIComponent(exerciseName)}`,
+					`${API_BASE}/routines/${encodeURIComponent(routineName)}/exercises/${encodeURIComponent(
+						exerciseName
+					)}`,
 					{
 						method: "DELETE",
 					}
@@ -67,33 +68,54 @@ export default function RoutineExerciseList({
 	}
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<h2>Exercises in this routine</h2>
+		<form className="page-stack" onSubmit={handleSubmit}>
+			<div className="section-header">
+				<h2 className="section-title">Exercises in this routine</h2>
+				<p className="status-text">{exercises.length} selected plan items</p>
+			</div>
 
 			{exercises.length === 0 ? (
-				<p>No exercises in this routine yet.</p>
+				<div className="empty-state">
+					<p>No exercises in this routine yet. Add existing exercises to build the plan.</p>
+				</div>
 			) : (
-				<ul className="flex flex-col gap-2 list-disc pl-5">
+				<ul className="card-grid">
 					{exercises.map((exercise) => (
-						<li key={exercise.id}>
-							<label>
+						<li
+							className={`fitness-card ${
+								selectedExercises.includes(exercise.name) ? "is-selected" : ""
+							}`}
+							key={exercise.id}
+						>
+							<label className="item-row">
 								<input
+									className="item-check"
 									type="checkbox"
 									checked={selectedExercises.includes(exercise.name)}
 									onChange={() => handleExerciseToggle(exercise.name)}
 								/>
-								{exercise.name} - {exercise.reps} reps - {exercise.weight_lbs} lbs
+								<span className="item-main">
+									<span className="item-name">{exercise.name}</span>
+									<span className="item-meta">
+										<span className="metric">
+											<strong>{exercise.weight_lbs}</strong> lb
+										</span>
+										<span className="metric">
+											<strong>{exercise.reps}</strong> reps
+										</span>
+									</span>
+								</span>
 							</label>
 						</li>
 					))}
 				</ul>
 			)}
 
-			<button type="submit" className="px-4 py-2 bg-red-500 text-white rounded">
+			<button type="submit" className="btn btn-danger">
 				Remove Selected Exercises
 			</button>
 
-			{error && <p>{error}</p>}
+			{error && <p className="error-text">{error}</p>}
 		</form>
 	);
 }

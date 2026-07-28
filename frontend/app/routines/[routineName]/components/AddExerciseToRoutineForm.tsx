@@ -21,6 +21,7 @@ export default function AddExerciseToRoutineForm({
 }: AddExerciseToRoutineFormProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [error, setError] = useState("");
@@ -36,7 +37,7 @@ export default function AddExerciseToRoutineForm({
     setError("");
     setIsLoading(true);
 
-    const response = await fetch("http://127.0.0.1:8000/workouts");
+    const response = await fetch(`${API_BASE}/workouts`);
 
     if (!response.ok) {
       setError("Failed to load exercises.");
@@ -72,9 +73,9 @@ export default function AddExerciseToRoutineForm({
     const responses = await Promise.all(
       selectedExercises.map((exerciseName) =>
         fetch(
-          `http://127.0.0.1:8000/routines/${encodeURIComponent(
-            routineName
-          )}/exercises/${encodeURIComponent(exerciseName)}`,
+          `${API_BASE}/routines/${encodeURIComponent(routineName)}/exercises/${encodeURIComponent(
+            exerciseName
+          )}`,
           {
             method: "POST",
           }
@@ -95,45 +96,62 @@ export default function AddExerciseToRoutineForm({
   }
 
   return (
-    <section>
+    <section className="fitness-card">
       {!isOpen ? (
-        <button type="button" onClick={loadWorkouts} disabled={isLoading} className="px-4 py-2 bg-blue-500 text-white rounded">
+        <button type="button" onClick={loadWorkouts} disabled={isLoading} className="btn btn-primary">
           {isLoading ? "Loading exercises..." : "Add Existing Exercises"}
         </button>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <h2>Add exercises to {routineName}</h2>
+        <form className="page-stack" onSubmit={handleSubmit}>
+          <h2 className="section-title">Add exercises to {routineName}</h2>
 
           {workouts.length === 0 ? (
-            <p>No exercises available.</p>
+            <p className="status-text">No exercises available.</p>
           ) : (
-           
-                <ul className="flex flex-col gap-2 list-disc pl-5">
+            <ul className="card-grid">
               {workouts.map((workout) => (
-                <label key={workout.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedExercises.includes(workout.name)}
-                    onChange={() => handleExerciseToggle(workout.name)}
-                  />
-                  {workout.name} - {workout.reps} reps - {workout.weight_lbs} lbs
-                </label>
-               
+                <li
+                  className={`fitness-card ${
+                    selectedExercises.includes(workout.name) ? "is-selected" : ""
+                  }`}
+                  key={workout.id}
+                >
+                  <label className="item-row">
+                    <input
+                      className="item-check"
+                      type="checkbox"
+                      checked={selectedExercises.includes(workout.name)}
+                      onChange={() => handleExerciseToggle(workout.name)}
+                    />
+                    <span className="item-main">
+                      <span className="item-name">{workout.name}</span>
+                      <span className="item-meta">
+                        <span className="metric">
+                          <strong>{workout.weight_lbs}</strong> lb
+                        </span>
+                        <span className="metric">
+                          <strong>{workout.reps}</strong> reps
+                        </span>
+                      </span>
+                    </span>
+                  </label>
+                </li>
               ))}
-              </ul>
-           
+            </ul>
           )}
 
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-            Add Selected Exercises
-          </button>
-          <button type="button" onClick={() => setIsOpen(false)} className="px-4 py-2 bg-gray-300 text-gray-700 rounded">
-            Cancel
-          </button>
+          <div className="action-row">
+            <button type="submit" className="btn btn-primary">
+              Add Selected Exercises
+            </button>
+            <button type="button" onClick={() => setIsOpen(false)} className="btn btn-secondary">
+              Cancel
+            </button>
+          </div>
         </form>
       )}
 
-      {error && <p>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </section>
   );
 }

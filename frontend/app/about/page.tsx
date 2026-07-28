@@ -73,33 +73,35 @@ const aboutItems: string[] = [
 
 export default function AboutPage() {
   return (
-    <main>
-      <section style={{ textAlign: "center" }}>
-        <a href="https://github.com/elvissanchez73">
-          <img
-            src="https://capsule-render.vercel.app/api?type=transparent&fontColor=1f9c8f&fontSize=54&height=90&width=922&text=Hi%2C%20I'm%20Elvis%20S%C3%A1nchez%20%F0%9F%92%BB%F0%9F%92%99"
-            alt="Hi, I'm Elvis Sanchez"
-          />
-        </a>
+    <main className="page-stack">
+      <section className="hero-panel">
+        <span className="eyebrow">Builder Profile</span>
+        <h1 className="page-title">Elvis Sanchez</h1>
+        <p className="page-copy">
+          Computer Engineer focused on building practical backend and full-stack
+          projects with Python, FastAPI, SQL, and modern web tools.
+        </p>
       </section>
 
-      <section>
-        <h2>About Me</h2>
+      <section className="fitness-card">
+        <h2 className="section-title">About Me</h2>
         <p>
           Computer Engineer passionate about backend development. Currently
           building practical Python projects while learning APIs, SQL, and
           modern software engineering.
         </p>
 
-        <ul>
+        <ul className="page-stack" style={{ marginTop: "18px" }}>
           {aboutItems.map((item) => (
-            <li key={item}>{item}</li>
+            <li className="fitness-card" key={item}>
+              {item}
+            </li>
           ))}
         </ul>
       </section>
 
-      <section>
-        <h2>Tech Stack</h2>
+      <section className="fitness-card">
+        <h2 className="section-title">Tech Stack</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {techBadges.map((badge) => (
             <img key={badge.alt} src={badge.src} alt={badge.alt} />
@@ -107,8 +109,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section>
-        <h2>Connect With Me</h2>
+      <section className="fitness-card">
+        <h2 className="section-title">Connect With Me</h2>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
           {socialLinks.map((link) => (
             <a
