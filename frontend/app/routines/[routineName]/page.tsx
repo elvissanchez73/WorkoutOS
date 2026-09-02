@@ -1,26 +1,37 @@
-"use client";
-
 import AddExerciseToRoutineForm from "./components/AddExerciseToRoutineForm";
 import RoutineExerciseList from "./components/RoutineExerciseList";
-import { getRoutineExercises, type Workout } from "@/lib/localStore";
-import { useEffect, useState } from "react";
+import { getApiUrl } from "@/lib/api";
 
-export default function RoutinePage({
+type Workout = {
+  id: number;
+  name: string;
+  reps: number;
+  weight_lbs: number;
+};
+
+export default async function RoutinePage({
   params,
   searchParams,
 }: {
-  params: { routineName: string };
-  searchParams: { addExercises?: string };
+  params: Promise<{ routineName: string }>;
+  searchParams: Promise<{ addExercises?: string }>;
 }) {
-  const { routineName } = params;
-  const { addExercises } = searchParams;
+  const { routineName } = await params;
+  const { addExercises } = await searchParams;
   const routineDecoded = decodeURIComponent(routineName);
-  const [workoutData, setWorkoutData] = useState<Workout[]>([]);
 
-  useEffect(() => {
-    const items = getRoutineExercises(routineDecoded) ?? [];
-    setWorkoutData(items);
-  }, [routineDecoded]);
+  const workoutResponse = await fetch(
+    await getApiUrl(`/routines/${encodeURIComponent(routineDecoded)}/exercises`),
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!workoutResponse.ok) {
+    return <p>Failed to fetch routine details.</p>;
+  }
+
+  const workoutData: Workout[] = await workoutResponse.json();
 
   return (
     <main className="page-stack">

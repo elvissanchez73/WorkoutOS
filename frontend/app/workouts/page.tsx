@@ -1,20 +1,47 @@
-"use client";
-
 import CreateWorkoutButton from "./components/CreateWorkoutButton";
 import WorkoutList from "./components/WorkoutList";
-import { getWorkouts, type Workout } from "@/lib/localStore";
-import { useEffect, useState } from "react";
+import { getApiUrl } from "@/lib/api";
 
-export default function WorkoutsPage() {
-  const [workouts, setWorkouts] = useState<(Workout & { estimated_1rm: number | null })[]>([]);
+type Workout = {
+  id: number;
+  name: string;
+  reps: number;
+  weight_lbs: number;
+  estimated_1rm: number | null;
+};
 
-  useEffect(() => {
-    const items = getWorkouts().map((workout) => ({
-      ...workout,
-      estimated_1rm: workout.weight_lbs * (1 + workout.reps / 30),
-    }));
-    setWorkouts(items);
-  }, []);
+type ApiWorkout = Omit<Workout, "estimated_1rm">;
+
+async function getWorkouts(): Promise<Workout[]> {
+  const response = await fetch(await getApiUrl("/workouts"), {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const workouts: ApiWorkout[] = await response.json();
+
+  return Promise.all(
+    workouts.map(async (workout) => {
+      const oneRepMaxResponse = await fetch(
+        await getApiUrl(`/workouts/${encodeURIComponent(workout.name)}/1rm`),
+        { cache: "no-store" }
+      );
+
+      if (!oneRepMaxResponse.ok) {
+        return { ...workout, estimated_1rm: null };
+      }
+
+      const data: { estimated_1rm: number } = await oneRepMaxResponse.json();
+      return { ...workout, estimated_1rm: data.estimated_1rm };
+    })
+  );
+}
+
+export default async function WorkoutsPage() {
+  const workouts = await getWorkouts();
 
   return (
     <main className="page-stack">

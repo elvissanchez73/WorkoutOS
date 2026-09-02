@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { addExercisesToRoutine, getWorkouts } from "@/lib/localStore";
 
 type Workout = {
   id: number;
@@ -22,6 +21,7 @@ export default function AddExerciseToRoutineForm({
 }: AddExerciseToRoutineFormProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const API_BASE = "/api";
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [error, setError] = useState("");
@@ -37,7 +37,16 @@ export default function AddExerciseToRoutineForm({
     setError("");
     setIsLoading(true);
 
-    setWorkouts(getWorkouts());
+    const response = await fetch(`${API_BASE}/workouts`);
+
+    if (!response.ok) {
+      setError("Failed to load exercises.");
+      setIsLoading(false);
+      return;
+    }
+
+    const data: Workout[] = await response.json();
+    setWorkouts(data);
     setIsOpen(true);
     setIsLoading(false);
   }
@@ -61,7 +70,25 @@ export default function AddExerciseToRoutineForm({
       return;
     }
 
-    addExercisesToRoutine(routineName, selectedExercises);
+    const responses = await Promise.all(
+      selectedExercises.map((exerciseName) =>
+        fetch(
+          `${API_BASE}/routines/${encodeURIComponent(routineName)}/exercises/${encodeURIComponent(
+            exerciseName
+          )}`,
+          {
+            method: "POST",
+          }
+        )
+      )
+    );
+
+    const failedResponse = responses.find((response) => !response.ok);
+
+    if (failedResponse) {
+      setError("One or more exercises could not be added.");
+      return;
+    }
 
     setSelectedExercises([]);
     setIsOpen(false);

@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { deleteWorkouts, updateWorkout } from "@/lib/localStore";
 
 type Workout = {
   id: number;
@@ -17,6 +16,7 @@ type WorkoutListProps = {
 };
 
 export default function WorkoutList({ workouts }: WorkoutListProps) {
+  const API_BASE = "/api";
   const router = useRouter();
   const [selectedWorkouts, setSelectedWorkouts] = useState<string[]>([]);
   const [error, setError] = useState("");
@@ -47,7 +47,20 @@ export default function WorkoutList({ workouts }: WorkoutListProps) {
       return;
     }
 
-    deleteWorkouts(selectedWorkouts);
+    const responses = await Promise.all(
+      selectedWorkouts.map((workoutName) =>
+        fetch(`${API_BASE}/workouts/${encodeURIComponent(workoutName)}`, {
+          method: "DELETE",
+        })
+      )
+    );
+
+    const failedResponse = responses.find((response) => !response.ok);
+
+    if (failedResponse) {
+      setError("One or more workouts could not be deleted.");
+      return;
+    }
 
     setSelectedWorkouts([]);
     router.refresh();
@@ -57,7 +70,23 @@ export default function WorkoutList({ workouts }: WorkoutListProps) {
     setError("");
     const draft = getDraftValue(workout);
 
-    updateWorkout(workout.name, draft.reps, draft.weight_lbs);
+    const [repsResponse, weightResponse] = await Promise.all([
+      fetch(`${API_BASE}/workouts/${encodeURIComponent(workout.name)}/reps`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ new_reps: draft.reps }),
+      }),
+      fetch(`${API_BASE}/workouts/${encodeURIComponent(workout.name)}/weight`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ new_weight: draft.weight_lbs }),
+      }),
+    ]);
+
+    if (!repsResponse.ok || !weightResponse.ok) {
+      setError("Workout could not be updated.");
+      return;
+    }
 
     router.refresh();
   }

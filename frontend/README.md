@@ -1,20 +1,30 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-The app's backend is implemented as Next.js route handlers in `app/api` and expects a managed Postgres database through `DATABASE_URL`.
+The app's backend is implemented as Next.js route handlers in `app/api` and expects PostgreSQL through `DATABASE_URL`.
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+
+For local PostgreSQL with pgAdmin 4:
+
+1. Create a database named `gym_tracker` in pgAdmin.
+2. Copy `.env.local.example` to `.env.local`.
+3. Replace `your_password` with your PostgreSQL password.
+4. Start the app with `npm run dev`.
+
+Example local connection string:
+
+```text
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/gym_tracker
+```
+
+The API creates the database tables automatically on first request.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
@@ -36,8 +46,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 Set this environment variable in the Vercel project:
 
 ```text
-DATABASE_URL=<your Postgres connection string>
+DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
 ```
+
+Your pgAdmin local database will not work on Vercel because Vercel cannot connect to `localhost` on your computer. For production, create a hosted PostgreSQL database with Neon, Supabase, Railway, or a Vercel Marketplace Postgres provider, then paste that hosted connection string into Vercel.
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 

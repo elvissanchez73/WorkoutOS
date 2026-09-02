@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import SubmitNewWorkout from "./SubmitNewWorkout";
-import { createWorkout } from "@/lib/localStore";
 
 export default function CreateWorkoutForm() {
     const router = useRouter();
+    const API_BASE = "/api";
     const [error, setError] = useState("");
 
     async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -17,10 +17,17 @@ export default function CreateWorkoutForm() {
         const reps = Number(formData.get("reps") as string);
         const weight_lbs = Number(formData.get("weight_lbs") as string);
 
-        const result = createWorkout({ name, reps, weight_lbs });
+        const response = await fetch(`${API_BASE}/workouts`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, reps, weight_lbs }),
+        });
 
-        if (!result.ok) {
-            setError(result.message ?? "Failed to create workout.");
+        if (!response.ok) {
+            const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
+            setError(payload?.detail ?? "Failed to create workout.");
             return;
         }
 

@@ -1,15 +1,26 @@
-"use client";
-
 import Link from "next/link";
 import RoutineList from "./components/RoutineList";
-import { getRoutines, type Routine } from "@/lib/localStore";
-import { useEffect, useState } from "react";
-export default function RoutinesPage() {
-  const [routines, setRoutines] = useState<Routine[]>([]);
+import { getApiUrl } from "@/lib/api";
 
-  useEffect(() => {
-    setRoutines(getRoutines());
-  }, []);
+type Routine = {
+  id: number;
+  name: string;
+};
+
+async function getRoutines(): Promise<Routine[]> {
+  const response = await fetch(await getApiUrl("/routines"), {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  return response.json();
+}
+
+export default async function RoutinesPage() {
+  const routines = await getRoutines();
 
   return (
     <main className="page-stack">
