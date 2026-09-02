@@ -6,7 +6,7 @@ import { FormEvent, useState } from "react";
 export default function CreateRoutineForm() {
 	const router = useRouter();
 	const [error, setError] = useState("");
-	const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+	const API_BASE = "/api";
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();

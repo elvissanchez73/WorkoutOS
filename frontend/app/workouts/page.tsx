@@ -1,5 +1,6 @@
 import CreateWorkoutButton from "./components/CreateWorkoutButton";
 import WorkoutList from "./components/WorkoutList";
+import { getApiUrl } from "@/lib/api";
 
 type Workout = {
   id: number;
@@ -12,9 +13,7 @@ type Workout = {
 type ApiWorkout = Omit<Workout, "estimated_1rm">;
 
 async function getWorkouts(): Promise<Workout[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
-  const response = await fetch(`${API_BASE}/workouts`, {
+  const response = await fetch(await getApiUrl("/workouts"), {
     cache: "no-store",
   });
 
@@ -27,7 +26,7 @@ async function getWorkouts(): Promise<Workout[]> {
   return Promise.all(
     workouts.map(async (workout) => {
       const oneRepMaxResponse = await fetch(
-        `${API_BASE}/workouts/${encodeURIComponent(workout.name)}/1rm`,
+        await getApiUrl(`/workouts/${encodeURIComponent(workout.name)}/1rm`),
         { cache: "no-store" }
       );
 

@@ -5,7 +5,7 @@ import SubmitNewWorkout from "./SubmitNewWorkout";
 
 export default function CreateWorkoutForm() {
     const router = useRouter();
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+    const API_BASE = "/api";
 
     async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();

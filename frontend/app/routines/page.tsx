@@ -1,14 +1,13 @@
 import Link from "next/link";
 import RoutineList from "./components/RoutineList";
+import { getApiUrl } from "@/lib/api";
 type Routine = {
   id: number;
   name: string;
 };
 
 async function getRoutines(): Promise<Routine[]> {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
-  const response = await fetch(`${API_BASE}/routines`, {
+  const response = await fetch(await getApiUrl("/routines"), {
     cache: "no-store",
   });
 
@@ -42,7 +41,7 @@ export default async function RoutinesPage() {
           <h2 className="section-title">Saved routines</h2>
           <p className="status-text">{routines.length} active</p>
         </div>
-      <RoutineList routines={routines} />
+        <RoutineList routines={routines} />
       </section>
     </main>
   );

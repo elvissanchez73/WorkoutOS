@@ -1,5 +1,6 @@
 import AddExerciseToRoutineForm from "./components/AddExerciseToRoutineForm";
 import RoutineExerciseList from "./components/RoutineExerciseList";
+import { getApiUrl } from "@/lib/api";
 
 type Workout = {
   id: number;
@@ -19,11 +20,12 @@ export default async function RoutinePage({
   const { addExercises } = await searchParams;
   const routineDecoded = decodeURIComponent(routineName);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
-  const workoutResponse = await fetch(`${API_BASE}/routines/${routineName}/exercises`, {
-    cache: "no-store",
-  });
+  const workoutResponse = await fetch(
+    await getApiUrl(`/routines/${encodeURIComponent(routineDecoded)}/exercises`),
+    {
+      cache: "no-store",
+    }
+  );
 
   if (!workoutResponse.ok) {
     return <p>Failed to fetch routine details.</p>;

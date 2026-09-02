@@ -16,7 +16,7 @@ type WorkoutListProps = {
 };
 
 export default function WorkoutList({ workouts }: WorkoutListProps) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+  const API_BASE = "/api";
   const router = useRouter();
   const [selectedWorkouts, setSelectedWorkouts] = useState<string[]>([]);
   const [error, setError] = useState("");

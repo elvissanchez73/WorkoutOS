@@ -1,5 +1,7 @@
 # WorkoutOS
-A full-stack workout tracking application built with Python, FastAPI, SQLite, and REST APIs to log exercises, manage workout routines, calculate estimated one-rep maxes, and organize reusable exercise history.
+A workout tracking application with a Next.js frontend and Vercel-hosted API routes for logging exercises, managing workout routines, calculating estimated one-rep maxes, and organizing reusable exercise history.
+
+The production backend now lives in `frontend/app/api` and uses a managed Postgres database. The Python FastAPI files are still in the repo for reference and local experimentation, but they are no longer the deployment target.
 
 ## Features
 
@@ -14,20 +16,21 @@ A full-stack workout tracking application built with Python, FastAPI, SQLite, an
 
 ## Tech Stack
 
-- Python
-- FastAPI
-- Pydantic
-- SQLite
-- Uvicorn
+- Next.js
+- React
+- TypeScript
+- Vercel route handlers
+- Postgres
 
 ## Project Structure
 
 ```text
-api.py                # FastAPI routes and request/response models
-workout_database.py   # SQLite tables and database helper functions
-models.py             # Workout class used by the app/database layer
-workouts.py           # Terminal menu for local testing
-requirements.txt      # Python dependencies
+frontend/app/api      # Vercel backend routes
+frontend/lib          # Shared API URL and database helpers
+frontend/app          # Next.js UI pages and components
+api.py                # Legacy FastAPI backend
+workout_database.py   # Legacy SQLite helpers
+requirements.txt      # Python dependencies for the legacy backend
 ```
 
 ## Database Design
@@ -47,26 +50,20 @@ routine_exercises
 - Allows one exercise to belong to many routines
 ```
 
-## Setup
+## Local Development
 
-Create and activate a virtual environment, then install dependencies:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
-
-## Run The API
+For the Vercel-backed app, work inside `frontend/`:
 
 ```powershell
-uvicorn api:app --reload
+cd frontend
+npm install
+npm run dev
 ```
 
-Open the interactive API docs:
+Set these environment variables in Vercel for production:
 
 ```text
-http://127.0.0.1:8000/docs
+DATABASE_URL=<your Postgres connection string>
 ```
 
 ## API Endpoints
@@ -129,9 +126,10 @@ python workouts.py
 - How to use Pydantic request and response models
 - How to return useful HTTP errors with `HTTPException`
 
-## Next Steps
+## Deployment
 
-- Build a React or Next.js frontend for the API
-- Add automated tests
-- Add Docker support
-- Deploy the API and frontend
+1. Deploy `frontend/` to Vercel.
+2. Add `DATABASE_URL` in the Vercel project settings.
+3. Redeploy after any backend route or database schema change.
+
+The API is available under the same deployment at `/api/...`.
