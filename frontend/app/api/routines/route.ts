@@ -14,10 +14,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ detail: "Invalid routine payload." }, { status: 400 });
   }
 
-  const created = await createRoutine(name);
-
-  if (!created) {
-    return NextResponse.json({ detail: "Routine already exists." }, { status: 409 });
+  try {
+    await createRoutine(name);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown database error.";
+    return NextResponse.json({ detail: `Failed to create routine: ${message}` }, { status: 500 });
   }
 
   return NextResponse.json({ message: `Routine ${name} created.` });

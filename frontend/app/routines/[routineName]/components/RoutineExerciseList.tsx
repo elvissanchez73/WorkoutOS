@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { removeExercisesFromRoutine } from "@/lib/localStore";
 
 type Workout = {
 	id: number;
@@ -20,7 +21,6 @@ export default function RoutineExerciseList({
 	exercises,
 }: RoutineExerciseListProps) {
 	const router = useRouter();
-	const API_BASE = "/api";
 	const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 	const [error, setError] = useState("");
 
@@ -43,25 +43,7 @@ export default function RoutineExerciseList({
 			return;
 		}
 
-		const responses = await Promise.all(
-			selectedExercises.map((exerciseName) =>
-				fetch(
-					`${API_BASE}/routines/${encodeURIComponent(routineName)}/exercises/${encodeURIComponent(
-						exerciseName
-					)}`,
-					{
-						method: "DELETE",
-					}
-				)
-			)
-		);
-
-		const failedResponse = responses.find((response) => !response.ok);
-
-		if (failedResponse) {
-			setError("One or more exercises could not be removed.");
-			return;
-		}
+		removeExercisesFromRoutine(routineName, selectedExercises);
 
 		setSelectedExercises([]);
 		router.refresh();

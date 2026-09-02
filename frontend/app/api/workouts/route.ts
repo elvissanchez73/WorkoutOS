@@ -16,12 +16,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ detail: "Invalid workout payload." }, { status: 400 });
   }
 
-  const created = await createWorkout(name, reps, weightLbs);
-
-  if (!created) {
+  try {
+    await createWorkout(name, reps, weightLbs);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown database error.";
     return NextResponse.json(
-      { detail: "Exercise already exists or failed to add exercise." },
-      { status: 409 }
+      { detail: `Failed to create workout: ${message}` },
+      { status: 500 }
     );
   }
 

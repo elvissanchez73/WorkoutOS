@@ -82,16 +82,12 @@ export async function getWorkout(name: string) {
 
 export async function createWorkout(name: string, reps: number, weightLbs: number) {
   await ensureSchema();
+  await sql`
+    INSERT INTO workouts (name, reps, weight_lbs)
+    VALUES (${normalizeName(name)}, ${reps}, ${weightLbs})
+  `;
 
-  try {
-    await sql`
-      INSERT INTO workouts (name, reps, weight_lbs)
-      VALUES (${normalizeName(name)}, ${reps}, ${weightLbs})
-    `;
-    return true;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 export async function deleteWorkout(name: string) {
@@ -149,16 +145,12 @@ export async function listRoutines() {
 
 export async function createRoutine(name: string) {
   await ensureSchema();
+  await sql`
+    INSERT INTO routines (name)
+    VALUES (${normalizeName(name)})
+  `;
 
-  try {
-    await sql`
-      INSERT INTO routines (name)
-      VALUES (${normalizeName(name)})
-    `;
-    return true;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 export async function deleteRoutine(name: string) {
@@ -198,15 +190,12 @@ export async function addExerciseToRoutine(routineName: string, exerciseName: st
     return false;
   }
 
-  try {
-    await sql`
-      INSERT INTO routine_exercises (routine_id, workout_id)
-      VALUES (${routineId}, ${workoutId})
-    `;
-    return true;
-  } catch {
-    return false;
-  }
+  await sql`
+    INSERT INTO routine_exercises (routine_id, workout_id)
+    VALUES (${routineId}, ${workoutId})
+  `;
+
+  return true;
 }
 
 export async function listRoutineExercises(routineName: string) {

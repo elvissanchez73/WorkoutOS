@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { createRoutine } from "@/lib/localStore";
 
 export default function CreateRoutineForm() {
 	const router = useRouter();
 	const [error, setError] = useState("");
-	const API_BASE = "/api";
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -15,16 +15,10 @@ export default function CreateRoutineForm() {
 		const formData = new FormData(event.currentTarget);
 		const name = formData.get("name") as string;
 
-		const response = await fetch(`${API_BASE}/routines`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ name }),
-		});
+		const result = createRoutine(name);
 
-		if (!response.ok) {
-			setError("Failed to create routine.");
+		if (!result.ok) {
+			setError(result.message ?? "Failed to create routine.");
 			return;
 		}
 
